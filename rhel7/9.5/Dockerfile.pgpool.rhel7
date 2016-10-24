@@ -24,6 +24,12 @@ hostname  \
 RUN mkdir -p /opt/cpm/bin
 RUN mkdir -p /opt/cpm/conf
 
+# set up secrets directory
+#
+RUN mkdir -p /home/secrets
+RUN chown -R daemon:daemon /home/secrets
+RUN chmod -R 700 /home/secrets
+
 # add volumes to allow override of pgpool config files
 VOLUME ["/pgconf"]
 

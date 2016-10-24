@@ -29,3 +29,7 @@ export PATH=/opt/cpm/bin:$PGROOT/bin:$PATH
 export LD_LIBRARY_PATH=$PGROOT/lib
 
 chown postgres $PGDATA $PGWAL
+
+cp /etc/secrets/..data/* /home/secrets
+chown -R postgres:postgres /home/secrets
+chmod -R 400 /home/secrets/*

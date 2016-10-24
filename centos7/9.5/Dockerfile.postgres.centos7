@@ -20,6 +20,12 @@ RUN mkdir -p /opt/cpm/bin /opt/cpm/conf /pgdata /pgwal /backup /pgconf /recover
 
 RUN chown -R postgres:postgres /opt/cpm /pgdata /pgwal /backup /pgconf /recover
 
+# set up secrets directory
+#
+RUN mkdir -p /home/secrets
+RUN chown -R postgres:postgres /home/secrets
+RUN chmod -R 700 /home/secrets
+
 # add path settings for postgres user
 ADD conf/.bash_profile /var/lib/pgsql/
 

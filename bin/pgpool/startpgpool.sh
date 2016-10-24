@@ -17,6 +17,10 @@
 rm -rf /tmp/pgpool.pid
 rm -rf /tmp/.s.*
 
+cp /etc/secrets/..data/* /home/secrets
+chown -R daemon:daemon /home/secrets
+chmod -R 400 /home/secrets/*
+
 env
 
 BINDIR=/opt/cpm/bin
