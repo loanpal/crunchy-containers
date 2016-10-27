@@ -77,4 +77,8 @@ chown -R $UID:$UID $BACKUP_PATH
 #
 chmod -R o+rx $BACKUP_PATH
 
-echo "backup has ended!"
+echo "backup has ended, pruning old backups at ${PRUNE_AGE} days"
+
+find ${BACKUPBASE} -mtime +${PRUNE_AGE} -delete
+
+echo "backup and pruning complete!"
