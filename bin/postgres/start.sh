@@ -56,14 +56,14 @@ export PG_DATABASE=$PG_DATABASE
 export PG_ROOT_PASSWORD=$PG_ROOT_PASSWORD
 
 
-mkdir -p /pgdata/$HOSTNAME
-chmod 0700 /pgdata/$HOSTNAME
+mkdir -p /pgdata/${SERVER_NAME}
+chmod 0700 /pgdata/${SERVER_NAME}
 
 if [[ -v ARCHIVE_MODE ]]; then
 	if [ $ARCHIVE_MODE == "on" ]; then
-		mkdir -p /pgwal/$HOSTNAME
-		chmod 0700 /pgwal/$HOSTNAME
-		echo "creating wal directory at " /pgwal/$HOSTNAME
+		mkdir -p /pgwal/${SERVER_NAME}
+		chmod 0700 /pgwal/${SERVER_NAME}
+		echo "creating wal directory at " /pgwal/${SERVER_NAME}
 	fi
 fi
 
