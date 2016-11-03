@@ -43,6 +43,8 @@ function ose_hack() {
 
 ose_hack
 
+export BACKUP_HOST=$MASTER_DC_SERVICE_HOST
+
 BACKUPBASE=/pgdata/$BACKUP_HOST
 if [ ! -d "$BACKUPBASE" ]; then
 	echo "creating BACKUPBASE directory..."
