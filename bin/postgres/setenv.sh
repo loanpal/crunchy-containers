@@ -23,6 +23,10 @@ fi
 
 echo "setting PGROOT to " $PGROOT
 
+if [[ "$PG_MODE" = "slave" ]]; then
+	export PG_MASTER_HOST=$MASTER_DC_SERVICE_HOST
+fi
+
 export PGDATA=/pgdata/${SERVER_NAME}
 export PGWAL=/pgwal/${SERVER_NAME}
 export PATH=/opt/cpm/bin:$PGROOT/bin:$PATH

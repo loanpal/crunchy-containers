@@ -23,6 +23,10 @@ chmod -R 400 /home/secrets/*
 
 env
 
+export PG_MASTER_SERVICE_NAME=$MASTER_DC_SERVICE_HOST
+export PG_SLAVE_SERVICE_NAME=$SLAVE_DC_SERVICE_HOST
+
+
 BINDIR=/opt/cpm/bin
 CONFDIR=/opt/cpm/conf/pgpool
 CONFIGS=/tmp
