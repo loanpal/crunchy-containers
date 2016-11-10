@@ -31,6 +31,12 @@ ls -l /pgdata
 
 env
 
+echo "Setting up email client for notifications"
+sed -i "s/{{EMAIL_AUTH_USER}}/${EMAIL_AUTH_USER}/g;" /etc/ssmtp/ssmtp.conf
+sed -i "s/{{EMAIL_AUTH_PASS}}/${EMAIL_AUTH_PASS}/g;" /etc/ssmtp/ssmtp.conf
+sed -i "s/{{EMAIL_DOMAIN}}/${EMAIL_DOMAIN}/g;" /etc/ssmtp/ssmtp.conf
+sed -i "s/{{EMAIL_SERVER}}/${EMAIL_SERVER}/g;" /etc/ssmtp/ssmtp.conf
+
 function ose_hack() {
         export USER_ID=$(id -u)
         export GROUP_ID=$(id -g)
@@ -82,5 +88,7 @@ chmod -R o+rx $BACKUP_PATH
 echo "backup has ended, pruning old backups at ${PRUNE_AGE} days"
 
 find ${BACKUPBASE} -mtime +${PRUNE_AGE} -delete
+
+du -sh /pgdata/*/*
 
 echo "backup and pruning complete!"
