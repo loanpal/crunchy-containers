@@ -20,4 +20,4 @@ VOLUME ["/pgdata"]
 
 USER 26
 
-CMD ["/opt/cpm/bin/start-backupjob.sh | sendmail -s Database Backup Complete ops@loanpal.com"]
+CMD ["/opt/cpm/bin/start-backupjob.sh"]

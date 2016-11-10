@@ -65,6 +65,8 @@ echo "BACKUP_LABEL is set to " $BACKUP_LABEL
 TS=`date +%Y-%m-%d-%H-%M-%S`
 BACKUP_PATH=$BACKUPBASE/$TS
 mkdir $BACKUP_PATH
+BACKUP_LOG=${BACKUP_PATH}/log
+mkdir $BACKUP_LOG
 
 
 export PGPASSFILE=/tmp/pgpass
@@ -77,7 +79,8 @@ chown $UID:$UID $PGPASSFILE
 
 cat $PGPASSFILE
 
-pg_basebackup --label=$BACKUP_LABEL --xlog --pgdata $BACKUP_PATH --host=$BACKUP_HOST --port=$BACKUP_PORT -U $BACKUP_USER
+echo "Starting backup!" >> ${BACKUP_LOG}/backup.log
+pg_basebackup --label=$BACKUP_LABEL --xlog --pgdata $BACKUP_PATH --host=$BACKUP_HOST --port=$BACKUP_PORT -U $BACKUP_USER &>> ${BACKUP_LOG}/backup.log 
 
 chown -R $UID:$UID $BACKUP_PATH
 # 
@@ -85,10 +88,11 @@ chown -R $UID:$UID $BACKUP_PATH
 #
 chmod -R o+rx $BACKUP_PATH
 
-echo "backup has ended, pruning old backups at ${PRUNE_AGE} days"
+echo "Backup has ended, pruning old backups at ${PRUNE_AGE} days" >> ${BACKUP_LOG}/backup.log
+find ${BACKUPBASE} -mtime +${PRUNE_AGE} -delete &>> /var/log/backup.log
 
-find ${BACKUPBASE} -mtime +${PRUNE_AGE} -delete
+echo "Querying disk space usage of backups" >> ${BACKUP_LOG}/backup.log
+du -sh /pgdata/*/* &>> ${BACKUP_LOG}/backup.log
 
-du -sh /pgdata/*/*
-
-echo "backup and pruning complete!"
+echo "Backup and pruning complete!"
+echo /var/log/backup.log | sendmail -s "DB Backup in Environment ${ENVIRONMENT} Complete" ${EMAIL_TARGET}
