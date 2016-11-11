@@ -31,12 +31,6 @@ ls -l /pgdata
 
 env
 
-echo "Setting up email client for notifications"
-sed -i "s/{{EMAIL_AUTH_USER}}/${EMAIL_AUTH_USER}/g;" /etc/ssmtp/ssmtp.conf
-sed -i "s/{{EMAIL_AUTH_PASS}}/${EMAIL_AUTH_PASS}/g;" /etc/ssmtp/ssmtp.conf
-sed -i "s/{{EMAIL_DOMAIN}}/${EMAIL_DOMAIN}/g;" /etc/ssmtp/ssmtp.conf
-sed -i "s/{{EMAIL_SERVER}}/${EMAIL_SERVER}/g;" /etc/ssmtp/ssmtp.conf
-
 function ose_hack() {
         export USER_ID=$(id -u)
         export GROUP_ID=$(id -g)
@@ -89,10 +83,33 @@ chown -R $UID:$UID $BACKUP_PATH
 chmod -R o+rx $BACKUP_PATH
 
 echo "Backup has ended, pruning old backups at ${PRUNE_AGE} days" >> ${BACKUP_LOG}/backup.log
-find ${BACKUPBASE} -mtime +${PRUNE_AGE} -delete &>> /var/log/backup.log
+find /pgdata -mtime +${PRUNE_AGE} -delete &>> ${BACKUP_LOG}/backup.log
 
 echo "Querying disk space usage of backups" >> ${BACKUP_LOG}/backup.log
 du -sh /pgdata/*/* &>> ${BACKUP_LOG}/backup.log
 
 echo "Backup and pruning complete!"
-echo /var/log/backup.log | sendmail -s "DB Backup in Environment ${ENVIRONMENT} Complete" ${EMAIL_TARGET}
+
+echo "Setting up email client for sending notifications" >> ${BACKUP_LOG}/backup.log
+echo "Email server is ${EMAIL_SERVER}" >> ${BACKUP_LOG}/backup.log
+echo "Email auth user is ${EMAIL_AUTH_USER}" >> ${BACKUP_LOG}/backup.log
+echo "Email rewrite domain is ${EMAIL_DOMAIN}" >> ${BACKUP_LOG}/backup.log
+sed -i "s/{{EMAIL_AUTH_USER}}/${EMAIL_AUTH_USER}/g;" /opt/cpm/conf/ssmtp.conf
+sed -i "s/{{EMAIL_AUTH_PASS}}/${EMAIL_AUTH_PASS}/g;" /opt/cpm/conf/ssmtp.conf
+sed -i "s/{{EMAIL_DOMAIN}}/${EMAIL_DOMAIN}/g;" /opt/cpm/conf/ssmtp.conf
+sed -i "s/{{EMAIL_SERVER}}/${EMAIL_SERVER}/g;" /opt/cpm/conf/ssmtp.conf
+echo "SSMTP client config is:" >> ${BACKUP_LOG}/backup.log
+cat /opt/cpm/conf/ssmtp.conf >> ${BACKUP_LOG}/backup.log
+
+echo "Let's see what's in the backup log"
+cat ${BACKUP_LOG}/backup.log
+
+echo "Now let's send the email"
+{
+  echo To: ${EMAIL_TARGET}
+  echo From: ${EMAIL_AUTH_USER}
+  echo Subject: DB Backup in Environment loanpal-${ENVIRONMENT} Complete
+  echo
+  cat ${BACKUP_LOG}/backup.log
+} | sendmail -v -C /opt/cpm/conf/ssmtp.conf ${EMAIL_TARGET}
+#} | sudo sendmail -v -C /opt/cpm/conf/ssmtp.conf ${EMAIL_TARGET}
