@@ -16,11 +16,6 @@ ADD conf/backup/ /opt/cpm/conf
 COPY conf/ssmtp/ssmtp.conf /opt/cpm/conf/ssmtp.conf
 RUN chown -R postgres:postgres /opt/cpm /pgdata
 
-#RUN echo 'Defaults:postgres !requiretty' >> /etc/sudoers
-#RUN echo 'postgres ALL=(ALL) NOPASSWD:/sbin/sendmail' >> /etc/sudoers
-#RUN echo 'postgres ALL=(ALL) NOPASSWD:/usr/sbin/sendmail' >> /etc/sudoers
-#RUN echo 'postgres ALL=(ALL) NOPASSWD:/etc/alternatives/mta' >> /etc/sudoers
-
 COPY conf/ssmtp/ssmtp.conf /opt/conf/ssmtp.conf
 
 VOLUME ["/pgdata"]

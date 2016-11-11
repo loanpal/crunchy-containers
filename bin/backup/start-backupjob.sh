@@ -112,4 +112,3 @@ echo "Now let's send the email"
   echo
   cat ${BACKUP_LOG}/backup.log
 } | sendmail -v -C /opt/cpm/conf/ssmtp.conf ${EMAIL_TARGET}
-#} | sudo sendmail -v -C /opt/cpm/conf/ssmtp.conf ${EMAIL_TARGET}
