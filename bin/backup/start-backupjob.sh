@@ -59,9 +59,7 @@ echo "BACKUP_LABEL is set to " $BACKUP_LABEL
 TS=`date +%Y-%m-%d-%H-%M-%S`
 BACKUP_PATH=$BACKUPBASE/$TS
 mkdir $BACKUP_PATH
-BACKUP_LOG=${BACKUP_PATH}/log
-mkdir $BACKUP_LOG
-
+BACKUP_LOG=${BACKUPBASE}/backup-${TS}.log
 
 export PGPASSFILE=/tmp/pgpass
 
@@ -73,8 +71,8 @@ chown $UID:$UID $PGPASSFILE
 
 cat $PGPASSFILE
 
-echo "Starting backup!" >> ${BACKUP_LOG}/backup.log
-pg_basebackup --label=$BACKUP_LABEL --xlog --pgdata $BACKUP_PATH --host=$BACKUP_HOST --port=$BACKUP_PORT -U $BACKUP_USER &>> ${BACKUP_LOG}/backup.log 
+echo "Starting backup!" >> ${BACKUP_LOG}
+pg_basebackup --label=$BACKUP_LABEL --xlog --pgdata $BACKUP_PATH --host=$BACKUP_HOST --port=$BACKUP_PORT -U $BACKUP_USER &>> ${BACKUP_LOG}
 
 chown -R $UID:$UID $BACKUP_PATH
 # 
@@ -82,27 +80,27 @@ chown -R $UID:$UID $BACKUP_PATH
 #
 chmod -R o+rx $BACKUP_PATH
 
-echo "Backup has ended, pruning old backups at ${PRUNE_AGE} days" >> ${BACKUP_LOG}/backup.log
-find /pgdata -mtime +${PRUNE_AGE} -delete &>> ${BACKUP_LOG}/backup.log
+echo "Backup has ended, pruning old backups at ${PRUNE_AGE} days" >> ${BACKUP_LOG}
+find /pgdata -mtime +${PRUNE_AGE} -delete &>> ${BACKUP_LOG}
 
-echo "Querying disk space usage of backups" >> ${BACKUP_LOG}/backup.log
-du -sh /pgdata/*/* &>> ${BACKUP_LOG}/backup.log
+echo "Querying disk space usage of backups" >> ${BACKUP_LOG}
+du -sh /pgdata/*/* &>> ${BACKUP_LOG}
 
 echo "Backup and pruning complete!"
 
-echo "Setting up email client for sending notifications" >> ${BACKUP_LOG}/backup.log
-echo "Email server is ${EMAIL_SERVER}" >> ${BACKUP_LOG}/backup.log
-echo "Email auth user is ${EMAIL_AUTH_USER}" >> ${BACKUP_LOG}/backup.log
-echo "Email rewrite domain is ${EMAIL_DOMAIN}" >> ${BACKUP_LOG}/backup.log
+echo "Setting up email client for sending notifications" >> ${BACKUP_LOG}
+echo "Email server is ${EMAIL_SERVER}" >> ${BACKUP_LOG}
+echo "Email auth user is ${EMAIL_AUTH_USER}" >> ${BACKUP_LOG}
+echo "Email rewrite domain is ${EMAIL_DOMAIN}" >> ${BACKUP_LOG}
 sed -i "s/{{EMAIL_AUTH_USER}}/${EMAIL_AUTH_USER}/g;" /opt/cpm/conf/ssmtp.conf
 sed -i "s/{{EMAIL_AUTH_PASS}}/${EMAIL_AUTH_PASS}/g;" /opt/cpm/conf/ssmtp.conf
 sed -i "s/{{EMAIL_DOMAIN}}/${EMAIL_DOMAIN}/g;" /opt/cpm/conf/ssmtp.conf
 sed -i "s/{{EMAIL_SERVER}}/${EMAIL_SERVER}/g;" /opt/cpm/conf/ssmtp.conf
-echo "SSMTP client config is:" >> ${BACKUP_LOG}/backup.log
-cat /opt/cpm/conf/ssmtp.conf >> ${BACKUP_LOG}/backup.log
+echo "SSMTP client config is:" >> ${BACKUP_LOG}
+cat /opt/cpm/conf/ssmtp.conf >> ${BACKUP_LOG}
 
 echo "Let's see what's in the backup log"
-cat ${BACKUP_LOG}/backup.log
+cat ${BACKUP_LOG}
 
 echo "Now let's send the email"
 {
@@ -110,5 +108,5 @@ echo "Now let's send the email"
   echo From: ${EMAIL_AUTH_USER}
   echo Subject: DB Backup in Environment loanpal-${ENVIRONMENT} Complete
   echo
-  cat ${BACKUP_LOG}/backup.log
+  cat ${BACKUP_LOG}
 } | sendmail -v -C /opt/cpm/conf/ssmtp.conf ${EMAIL_TARGET}
