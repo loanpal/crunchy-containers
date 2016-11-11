@@ -89,18 +89,10 @@ du -sh /pgdata/*/* &>> ${BACKUP_LOG}
 echo "Backup and pruning complete!"
 
 echo "Setting up email client for sending notifications" >> ${BACKUP_LOG}
-echo "Email server is ${EMAIL_SERVER}" >> ${BACKUP_LOG}
-echo "Email auth user is ${EMAIL_AUTH_USER}" >> ${BACKUP_LOG}
-echo "Email rewrite domain is ${EMAIL_DOMAIN}" >> ${BACKUP_LOG}
 sed -i "s/{{EMAIL_AUTH_USER}}/${EMAIL_AUTH_USER}/g;" /opt/cpm/conf/ssmtp.conf
 sed -i "s/{{EMAIL_AUTH_PASS}}/${EMAIL_AUTH_PASS}/g;" /opt/cpm/conf/ssmtp.conf
 sed -i "s/{{EMAIL_DOMAIN}}/${EMAIL_DOMAIN}/g;" /opt/cpm/conf/ssmtp.conf
 sed -i "s/{{EMAIL_SERVER}}/${EMAIL_SERVER}/g;" /opt/cpm/conf/ssmtp.conf
-echo "SSMTP client config is:" >> ${BACKUP_LOG}
-cat /opt/cpm/conf/ssmtp.conf >> ${BACKUP_LOG}
-
-echo "Let's see what's in the backup log"
-cat ${BACKUP_LOG}
 
 echo "Now let's send the email"
 {
