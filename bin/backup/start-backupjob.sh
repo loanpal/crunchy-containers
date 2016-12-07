@@ -88,17 +88,17 @@ du -sh /pgdata/*/* &>> ${BACKUP_LOG}
 
 echo "Backup and pruning complete!"
 
-echo "Setting up email client for sending notifications" >> ${BACKUP_LOG}
-sed -i "s/{{EMAIL_AUTH_USER}}/${EMAIL_AUTH_USER}/g;" /opt/cpm/conf/ssmtp.conf
-sed -i "s/{{EMAIL_AUTH_PASS}}/${EMAIL_AUTH_PASS}/g;" /opt/cpm/conf/ssmtp.conf
-sed -i "s/{{EMAIL_DOMAIN}}/${EMAIL_DOMAIN}/g;" /opt/cpm/conf/ssmtp.conf
-sed -i "s/{{EMAIL_SERVER}}/${EMAIL_SERVER}/g;" /opt/cpm/conf/ssmtp.conf
+#echo "Setting up email client for sending notifications" >> ${BACKUP_LOG}
+#sed -i "s/{{EMAIL_AUTH_USER}}/${EMAIL_AUTH_USER}/g;" /opt/cpm/conf/ssmtp.conf
+#sed -i "s/{{EMAIL_AUTH_PASS}}/${EMAIL_AUTH_PASS}/g;" /opt/cpm/conf/ssmtp.conf
+#sed -i "s/{{EMAIL_DOMAIN}}/${EMAIL_DOMAIN}/g;" /opt/cpm/conf/ssmtp.conf
+#sed -i "s/{{EMAIL_SERVER}}/${EMAIL_SERVER}/g;" /opt/cpm/conf/ssmtp.conf
 
-echo "Now let's send the email"
-{
-  echo To: ${EMAIL_TARGET}
-  echo From: ${EMAIL_AUTH_USER}
-  echo Subject: DB Backup in Environment loanpal-${ENVIRONMENT} Complete
-  echo
-  cat ${BACKUP_LOG}
-} | sendmail -v -C /opt/cpm/conf/ssmtp.conf ${EMAIL_TARGET}
+#echo "Now let's send the email"
+#{
+#  echo To: ${EMAIL_TARGET}
+#  echo From: ${EMAIL_AUTH_USER}
+#  echo Subject: DB Backup in Environment loanpal-${ENVIRONMENT} Complete
+#  echo
+#  cat ${BACKUP_LOG}
+#} | sendmail -v -C /opt/cpm/conf/ssmtp.conf ${EMAIL_TARGET}
