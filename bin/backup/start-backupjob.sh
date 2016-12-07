@@ -59,7 +59,6 @@ echo "BACKUP_LABEL is set to " $BACKUP_LABEL
 TS=`date +%Y-%m-%d-%H-%M-%S`
 BACKUP_PATH=$BACKUPBASE/$TS
 mkdir $BACKUP_PATH
-BACKUP_LOG=${BACKUPBASE}/backup-${TS}.log
 
 export PGPASSFILE=/tmp/pgpass
 
@@ -71,8 +70,8 @@ chown $UID:$UID $PGPASSFILE
 
 cat $PGPASSFILE
 
-echo "Starting backup!" >> ${BACKUP_LOG}
-pg_basebackup --label=$BACKUP_LABEL --xlog --pgdata $BACKUP_PATH --host=$BACKUP_HOST --port=$BACKUP_PORT -U $BACKUP_USER &>> ${BACKUP_LOG}
+echo "Starting backup!"
+pg_basebackup --label=$BACKUP_LABEL --xlog --pgdata $BACKUP_PATH --host=$BACKUP_HOST --port=$BACKUP_PORT -U $BACKUP_USER 
 
 chown -R $UID:$UID $BACKUP_PATH
 # 
@@ -80,15 +79,15 @@ chown -R $UID:$UID $BACKUP_PATH
 #
 chmod -R o+rx $BACKUP_PATH
 
-echo "Backup has ended, pruning old backups at ${PRUNE_AGE} days" >> ${BACKUP_LOG}
-find /pgdata -mtime +${PRUNE_AGE} -delete &>> ${BACKUP_LOG}
+echo "Backup has ended, pruning old backups at ${PRUNE_AGE} days"
+find /pgdata -mindepth 1 -mtime +${PRUNE_AGE} -delete
 
-echo "Querying disk space usage of backups" >> ${BACKUP_LOG}
-du -sh /pgdata/*/* &>> ${BACKUP_LOG}
+echo "Querying disk space usage of backups"
+du -sh /pgdata/*/*
 
 echo "Backup and pruning complete!"
 
-#echo "Setting up email client for sending notifications" >> ${BACKUP_LOG}
+#echo "Setting up email client for sending notifications"
 #sed -i "s/{{EMAIL_AUTH_USER}}/${EMAIL_AUTH_USER}/g;" /opt/cpm/conf/ssmtp.conf
 #sed -i "s/{{EMAIL_AUTH_PASS}}/${EMAIL_AUTH_PASS}/g;" /opt/cpm/conf/ssmtp.conf
 #sed -i "s/{{EMAIL_DOMAIN}}/${EMAIL_DOMAIN}/g;" /opt/cpm/conf/ssmtp.conf
@@ -100,5 +99,5 @@ echo "Backup and pruning complete!"
 #  echo From: ${EMAIL_AUTH_USER}
 #  echo Subject: DB Backup in Environment loanpal-${ENVIRONMENT} Complete
 #  echo
-#  cat ${BACKUP_LOG}
+#  cat
 #} | sendmail -v -C /opt/cpm/conf/ssmtp.conf ${EMAIL_TARGET}
